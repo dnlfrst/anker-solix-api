@@ -137,6 +137,8 @@ async def fetch_anker_data():
                 }
                 power_data.append(data)
 
+                print(data)
+
         return power_data
 
 
@@ -203,9 +205,9 @@ def write_to_influx(data):
 
 if __name__ == "__main__":
     start_time = time.time()
-    delay = 9
+    delay = 20
     iterations = 0
-    max_iterations = 6  # Run 6 times (every 9 seconds for one minute)
+    max_iterations = 3
     
     while iterations < max_iterations:
         try:
