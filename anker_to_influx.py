@@ -1,6 +1,7 @@
 import asyncio
 import os
 from datetime import datetime, timedelta
+import time
 
 from aiohttp import ClientSession
 from api import api
@@ -201,14 +202,32 @@ def write_to_influx(data):
 
 
 if __name__ == "__main__":
-    try:
-        data = asyncio.run(fetch_anker_data())
-        
-        if data:
-            write_to_influx(data)
+    start_time = time.time()
+    delay = 9
+    iterations = 0
+    max_iterations = 6  # Run 6 times (every 9 seconds for one minute)
+    
+    while iterations < max_iterations:
+        try:
+            data = asyncio.run(fetch_anker_data())
             
-            print("✅ Data successfully written to InfluxDB")
-        else:
-            print("No data received from Anker API")
-    except Exception as error:
-        print(f"❌ Error: {str(error)}")
+            if data:
+                write_to_influx(data)
+                print(f"✅ Data successfully written to InfluxDB at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} (iteration {iterations + 1}/{max_iterations})")
+            else:
+                print(f"No data received from Anker API (iteration {iterations + 1}/{max_iterations})")
+            
+            iterations += 1
+            
+            # Don't sleep after the last iteration
+            if iterations < max_iterations:
+                time.sleep(delay)
+                
+        except Exception as error:
+            print(f"❌ Error: {str(error)}")
+            iterations += 1
+            if iterations < max_iterations:
+                time.sleep(delay)
+    
+    elapsed = time.time() - start_time
+    print(f"Completed {iterations} iterations in {elapsed:.1f} seconds")
