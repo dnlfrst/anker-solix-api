@@ -203,7 +203,6 @@ def write_to_influx(data):
 
 if __name__ == "__main__":
     start_time = time.time()
-    delay = 9
     iterations = 0
     max_iterations = 6  # Run 6 times (every 9 seconds for one minute)
     
@@ -216,18 +215,10 @@ if __name__ == "__main__":
                 print(f"✅ Data successfully written to InfluxDB at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} (iteration {iterations + 1}/{max_iterations})")
             else:
                 print(f"No data received from Anker API (iteration {iterations + 1}/{max_iterations})")
-            
-            iterations += 1
-            
-            # Don't sleep after the last iteration
-            if iterations < max_iterations:
-                time.sleep(delay)
-                
         except Exception as error:
             print(f"❌ Error: {str(error)}")
+        finally:
             iterations += 1
-            if iterations < max_iterations:
-                time.sleep(delay)
     
     elapsed = time.time() - start_time
     print(f"Completed {iterations} iterations in {elapsed:.1f} seconds")
