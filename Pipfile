@@ -7,9 +7,11 @@ name = "pypi"
 cryptography = "*"
 aiohttp = "*"
 aiofiles = "*"
+dotenv = "*"
+influxdb-client = "*"
 
 [dev-packages]
 pre-commit = "*"
 
 [requires]
-python_version = ">=3.12"
+python_version = "3.12"
