@@ -203,6 +203,7 @@ def write_to_influx(data):
 
 if __name__ == "__main__":
     start_time = time.time()
+    delay = 9
     iterations = 0
     max_iterations = 6  # Run 6 times (every 9 seconds for one minute)
     
@@ -219,6 +220,9 @@ if __name__ == "__main__":
             print(f"❌ Error: {str(error)}")
         finally:
             iterations += 1
+            
+            if iterations < max_iterations:
+                time.sleep(delay)
     
     elapsed = time.time() - start_time
     print(f"Completed {iterations} iterations in {elapsed:.1f} seconds")
