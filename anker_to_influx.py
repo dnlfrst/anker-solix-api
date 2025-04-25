@@ -69,16 +69,16 @@ def calculate_daily_stats(client, site_name, current_timestamp):
         grid_import_result = query_api.query(org=INFLUX_ORG, query=grid_import_query)
         
         # Extract values from results (default to 0 if no data)
-        daily_consumption = consumption_result[0].records[0].get_value() if consumption_result else 0
-        daily_generation = generation_result[0].records[0].get_value() if generation_result else 0
-        grid_import = grid_import_result[0].records[0].get_value() if grid_import_result else 0
+        daily_consumption = float(consumption_result[0].records[0].get_value() if consumption_result else 0.0)
+        daily_generation = float(generation_result[0].records[0].get_value() if generation_result else 0.0)
+        grid_import = float(grid_import_result[0].records[0].get_value() if grid_import_result else 0.0)
         
         # Calculate self-consumed energy
         self_consumed = daily_consumption - grid_import
         
         # Calculate metrics
-        autarky = (self_consumed / daily_consumption * 100) if daily_consumption > 0 else 0
-        self_consumption = (self_consumed / daily_generation * 100) if daily_generation > 0 else 0
+        autarky = float(self_consumed / daily_consumption * 100) if daily_consumption > 0 else 0.0
+        self_consumption = float(self_consumed / daily_generation * 100) if daily_generation > 0 else 0.0
 
         return {
             'daily_consumption': daily_consumption,
@@ -107,8 +107,8 @@ async def fetch_anker_data():
                 grid_info = site.get('grid_info', {})
                 
                 # Get battery info from first solarbank if available
-                battery_charge_power = 0
-                battery_percentage = 0
+                battery_charge_power = 0.0
+                battery_percentage = 0.0
                 if info['solarbank_list']:
                     first_bank = info['solarbank_list'][0]
                     battery_charge_power = float(first_bank['charging_power'])
@@ -120,19 +120,19 @@ async def fetch_anker_data():
                     'site_name': site['site_info']['site_name'],
                     # Solar metrics
                     'total_photovoltaic_power': float(info['total_photovoltaic_power']),
-                    'solar_power_1': float(info['solar_power_1']),
-                    'solar_power_2': float(info['solar_power_2']),
-                    'solar_power_3': float(info['solar_power_3']),
-                    'solar_power_4': float(info['solar_power_4']),
+                    'solar_power_1': float(info.get('solar_power_1', 0.0)),
+                    'solar_power_2': float(info.get('solar_power_2', 0.0)),
+                    'solar_power_3': float(info.get('solar_power_3', 0.0)),
+                    'solar_power_4': float(info.get('solar_power_4', 0.0)),
                     # Battery metrics
                     'battery_percentage': battery_percentage,
                     'battery_charge_power': battery_charge_power,
                     # Home and grid metrics
-                    'home_load_power': float(site['home_load_power']),
-                    'grid_to_home_power': float(grid_info.get('grid_to_home_power', 0)),
-                    'photovoltaic_to_grid_power': float(grid_info.get('photovoltaic_to_grid_power', 0)),
-                    'to_home_load': float(info['to_home_load']),
-                    'ac_power': float(info['ac_power']),
+                    'home_load_power': float(site.get('home_load_power', 0.0)),
+                    'grid_to_home_power': float(grid_info.get('grid_to_home_power', 0.0)),
+                    'photovoltaic_to_grid_power': float(grid_info.get('photovoltaic_to_grid_power', 0.0)),
+                    'to_home_load': float(info.get('to_home_load', 0.0)),
+                    'ac_power': float(info.get('ac_power', 0.0)),
                     'timestamp': timestamp
                 }
                 power_data.append(data)
